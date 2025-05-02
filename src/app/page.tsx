@@ -1,46 +1,19 @@
 import { StepForm } from "@/components/form/form";
+import HomeHeroSection from "@/components/hero-sections/hero-section-home";
 import { ArrowIcon } from "@/components/icons/arrowIcon";
 import { HomeIcon } from "@/components/icons/homeIcon";
 import { RoundRightIcon } from "@/components/icons/roundRightIcon";
 import { BlogSection } from "@/components/sub-components/blogs";
 import { CTASection } from "@/components/sub-components/cta-section";
 import { Testimonials } from "@/components/sub-components/testimonial";
+import TriangleImage from "@/components/sub-components/triangleImage";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="lg:space-y-32 space-y-20">
-      <div
-        id="home"
-        className="relative flex min-h-[500px] w-full items-center overflow-hidden"
-      >
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/assets/images/hero.png"
-            alt="hero-sec"
-            fill
-            className="object-fill"
-          />
-        </div>
-
-        {/* Content Container */}
-        <div className="container relative z-10 mx-auto flex flex-col items-start gap-8 lg:px-10 px-5 lg:py-12 py-6 md:flex-row md:items-start md:gap-16 lg:gap-24">
-          {/* Left Column - Text */}
-          <div className="w-full md:w-1/2">
-            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-6xl">
-              Estimate Your Roof Replacement Costs Instantly
-            </h1>
-          </div>
-
-          {/* Right Column - Form */}
-          <div className="w-full md:w-1/2">
-            <div className="rounded-4xl bg-white p-6 shadow-lg">
-              <StepForm />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="lg:space-y-20 space-y-16">
+      <HomeHeroSection />
 
       <section id="projects">
         <div className="px-5 lg:px-10 lg:pb-12 pb-6 ">
@@ -202,6 +175,10 @@ export default function Home() {
                   extra line of defense against water infiltration.
                 </p>
               </div>
+              <div className="flex  gap-4">
+                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg bg-orange-400 rounded-full  transition-colors ease-in-out hover:bg-orange-300">Commercial</Button>
+                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg rounded-full  transition-colors ease-in-out hover:opacity-90">Repairs</Button>
+              </div>
             </div>
 
             {/* Right Column - Images */}
@@ -219,6 +196,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
       <div className="lg:space-y-18 space-y-12">
         <div id="testimonials">
           <Testimonials />
