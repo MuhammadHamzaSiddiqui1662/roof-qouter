@@ -20,7 +20,7 @@ export function CTASection() {
           Learn more about our quoting process and what&apos;s covered in your roofing estimate.
         </h2>
         <Link
-          href="/quoting-process"
+          href="#"
           className="mt-8 rounded-full bg-orange-400 px-8 py-3 font-medium text-white transition-colors hover:bg-orange-300"
         >
           Learn More

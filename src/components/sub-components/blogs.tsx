@@ -72,7 +72,7 @@ export function BlogSection() {
                 </h3>
                 <div className="mt-auto pt-4">
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`#`}
                     className="inline-flex items-center w-40 h-11 rounded-full justify-center bg-orange-400 text-white transition duration-700 delay-150 ease-in-out hover:bg-orange-300"
                   >
                     Learn More

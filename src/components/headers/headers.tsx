@@ -68,9 +68,11 @@ export default function Navbar() {
         </nav>
         {/* CTA Button */}
         <div className="hidden md:block">
-          <Button className="rounded-full w-34 font-bold h-12 bg-orange-400 text-white transition duration-700 delay-150 ease-in-out hover:bg-orange-400 hover:scale-110">
-            Get Quote
-          </Button>
+          <Link href={'#home'}>
+            <Button className="rounded-full w-34 font-bold h-12 bg-orange-400 text-white transition duration-700 delay-150 ease-in-out hover:bg-orange-400 hover:scale-110">
+              Get Quote
+            </Button>
+          </Link>
         </div>
         {/* Mobile Navigation */}
         <div
@@ -108,9 +110,14 @@ export default function Navbar() {
             >
               Contact us
             </Link>
-            <Button className="w-full bg-orange-400 hover:bg-orange-600">
-              Get Quote
-            </Button>
+            <Link href="#home">
+              <Button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="w-full bg-orange-400 hover:bg-orange-600"
+              >
+                Get Quote
+              </Button>
+            </Link>
           </nav>
         </div>{" "}
       </div>

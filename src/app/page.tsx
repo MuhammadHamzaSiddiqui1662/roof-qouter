@@ -13,7 +13,9 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="lg:space-y-20 space-y-16">
-      <HomeHeroSection />
+      <div id="home">
+        <HomeHeroSection />
+      </div>
 
       <section id="projects">
         <div className="px-5 lg:px-10 lg:pb-12 pb-6 ">
@@ -176,8 +178,12 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex  gap-4">
-                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg bg-orange-400 rounded-full  transition-colors ease-in-out hover:bg-orange-300">Commercial</Button>
-                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg rounded-full  transition-colors ease-in-out hover:opacity-90">Repairs</Button>
+                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg bg-orange-400 rounded-full  transition-colors ease-in-out hover:bg-orange-300">
+                  Commercial
+                </Button>
+                <Button className="lg:w-48 w-32 lg:h-14 h-10 lg:text-lg rounded-full  transition-colors ease-in-out hover:opacity-90">
+                  Repairs
+                </Button>
               </div>
             </div>
 

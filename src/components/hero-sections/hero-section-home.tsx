@@ -23,7 +23,6 @@ export default function HomeHeroSection() {
     <div className="relative">
       {/* Hero Section */}
       <div
-        id="home"
         className={`relative flex w-full items-center overflow-hidden ${
           currentStep === 1 ? "min-h-[500px]" : "min-h-[350px]"
         }`}
