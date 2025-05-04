@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
 
 interface TriangleImageProps {
@@ -16,12 +15,6 @@ export default function TriangleImage({
   className = "",
   priority = false,
 }: TriangleImageProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <div className="relative h-full w-full overflow-hidden">
       {/* Main Image */}
