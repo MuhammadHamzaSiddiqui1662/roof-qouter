@@ -5,6 +5,7 @@ import { HomeIcon } from "@/components/icons/homeIcon";
 import { RoundRightIcon } from "@/components/icons/roundRightIcon";
 import { BlogSection } from "@/components/sub-components/blogs";
 import { CTASection } from "@/components/sub-components/cta-section";
+import DynamicCarousel from "@/components/sub-components/dynamic-carousel";
 import { Testimonials } from "@/components/sub-components/testimonial";
 import TriangleImage from "@/components/sub-components/triangleImage";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,13 @@ export default function Home() {
       <div id="home">
         <HomeHeroSection />
       </div>
+
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
+        <h2 className="text-4xl mb-4 font-bold text-gray-700 md:text-3xl">
+          Roofing Companies
+        </h2>
+        <DynamicCarousel />
+      </main>
 
       <section id="projects">
         <div className="px-5 lg:px-10 lg:pb-12 pb-6 ">
