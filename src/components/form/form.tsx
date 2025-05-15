@@ -1,23 +1,23 @@
-"use client"
-import { useState } from "react"
-import type React from "react"
+"use client";
+import { useState } from "react";
+import type React from "react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ProgressIndicator } from "../sub-components/progress-indicator"
-import { ArrowLeft } from "lucide-react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ProgressIndicator } from "../sub-components/progress-indicator";
+import { ArrowLeft } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StepFormProps {
-  currentStep: number
-  setCurrentStep: (step: number) => void
+  currentStep: number;
+  setCurrentStep: (step: number) => void;
 }
 
 export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
-  const totalSteps = 5
-  const { toast } = useToast()
+  const totalSteps = 5;
+  const {} = useToast();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     address: "",
     confirmAddress: "",
     ownership: "",
-  })
+  });
 
   // Form validation errors
   const [errors, setErrors] = useState({
@@ -33,85 +33,85 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     address: "",
     confirmAddress: "",
     ownership: "",
-  })
+  });
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
+    const { id, value } = e.target;
     setFormData({
       ...formData,
       [id]: value,
-    })
+    });
 
     // Clear error when user types
     if (errors[id as keyof typeof errors]) {
       setErrors({
         ...errors,
         [id]: "",
-      })
+      });
     }
-  }
+  };
 
   // Handle radio change
   const handleRadioChange = (value: string) => {
     setFormData({
       ...formData,
       ownership: value,
-    })
+    });
 
     // Clear error when user selects
     if (errors.ownership) {
       setErrors({
         ...errors,
         ownership: "",
-      })
+      });
     }
-  }
+  };
 
   // Validate current step
   const validateStep = () => {
-    let isValid = true
-    const newErrors = { ...errors }
+    let isValid = true;
+    const newErrors = { ...errors };
 
     if (currentStep === 1) {
       if (!formData.zipCode.trim()) {
-        newErrors.zipCode = " "
-        isValid = false
+        newErrors.zipCode = " ";
+        isValid = false;
       }
     } else if (currentStep === 2) {
       if (!formData.address.trim()) {
-        newErrors.address = " "
-        isValid = false
+        newErrors.address = " ";
+        isValid = false;
       }
     } else if (currentStep === 3) {
       if (!formData.confirmAddress.trim()) {
-        newErrors.confirmAddress = " "
-        isValid = false
+        newErrors.confirmAddress = " ";
+        isValid = false;
       }
     } else if (currentStep === 4) {
       if (!formData.ownership) {
-        newErrors.ownership = " "
-        isValid = false
+        newErrors.ownership = " ";
+        isValid = false;
       }
     }
 
-    setErrors(newErrors)
-    return isValid
-  }
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const nextStep = () => {
     if (validateStep()) {
       if (currentStep < totalSteps) {
-        setCurrentStep(currentStep + 1)
+        setCurrentStep(currentStep + 1);
       }
     }
-  }
+  };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      setCurrentStep(currentStep - 1);
     }
-  }
+  };
 
   // Step titles and subtitles
   const stepContent = {
@@ -128,7 +128,8 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     4: {
-      title: "Do you currently own or have authority with respect to this house?",
+      title:
+        "Do you currently own or have authority with respect to this house?",
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     5: {
@@ -136,7 +137,7 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       subtitle:
         "A display text style is intended for use at large sizes for headings, rather than for extended passages of body text.",
     },
-  }
+  };
 
   return (
     <div>
@@ -149,7 +150,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
         {stepContent[currentStep as keyof typeof stepContent]?.title}
       </h2>
 
-      <p className="mb-6 text-gray-500">{stepContent[currentStep as keyof typeof stepContent]?.subtitle}</p>
+      <p className="mb-6 text-gray-500">
+        {stepContent[currentStep as keyof typeof stepContent]?.subtitle}
+      </p>
 
       {/* Step 1 */}
       {currentStep === 1 && (
@@ -158,17 +161,25 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="zipCode"
               placeholder="Enter zip code"
-              className={`mt-1 p-4 h-12 ${errors.zipCode ? "border-red-500" : ""}`}
+              className={`mt-1 p-4 h-12 ${
+                errors.zipCode ? "border-red-500" : ""
+              }`}
               value={formData.zipCode}
               onChange={handleInputChange}
               required
             />
-            {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
+            {errors.zipCode && (
+              <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>
+            )}
           </div>
 
           <div className="flex justify-between items-center">
             {currentStep > 1 && (
-              <Button onClick={prevStep} variant="ghost" className="flex items-center gap-2 text-gray-600">
+              <Button
+                onClick={prevStep}
+                variant="ghost"
+                className="flex items-center gap-2 text-gray-600"
+              >
                 <ArrowLeft size={16} />
                 Back
               </Button>
@@ -190,16 +201,24 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="address"
               placeholder="Enter address"
-              className={`mt-1 p-4 h-12 ${errors.address ? "border-red-500" : ""}`}
+              className={`mt-1 p-4 h-12 ${
+                errors.address ? "border-red-500" : ""
+              }`}
               value={formData.address}
               onChange={handleInputChange}
               required
             />
-            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+            {errors.address && (
+              <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+            )}
           </div>
 
           <div className="flex justify-between items-center">
-            <Button onClick={prevStep} variant="ghost" className="flex items-center gap-2 text-gray-600">
+            <Button
+              onClick={prevStep}
+              variant="ghost"
+              className="flex items-center gap-2 text-gray-600"
+            >
               <ArrowLeft size={16} />
               Back
             </Button>
@@ -220,16 +239,26 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="confirmAddress"
               placeholder="7500 Setzler Pkwy, Minneapolis, MN 55445, USA"
-              className={`mt-1 p-4 h-12 ${errors.confirmAddress ? "border-red-500" : ""}`}
+              className={`mt-1 p-4 h-12 ${
+                errors.confirmAddress ? "border-red-500" : ""
+              }`}
               value={formData.confirmAddress}
               onChange={handleInputChange}
               required
             />
-            {errors.confirmAddress && <p className="text-red-500 text-sm mt-1">{errors.confirmAddress}</p>}
+            {errors.confirmAddress && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.confirmAddress}
+              </p>
+            )}
           </div>
 
           <div className="flex justify-between items-center">
-            <Button onClick={prevStep} variant="ghost" className="flex items-center gap-2 text-gray-600">
+            <Button
+              onClick={prevStep}
+              variant="ghost"
+              className="flex items-center gap-2 text-gray-600"
+            >
               <ArrowLeft size={16} />
               Back
             </Button>
@@ -246,20 +275,36 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       {/* Step 4 */}
       {currentStep === 4 && (
         <div className="space-y-6">
-          <RadioGroup value={formData.ownership} onValueChange={handleRadioChange} className="space-y-4">
+          <RadioGroup
+            value={formData.ownership}
+            onValueChange={handleRadioChange}
+            className="space-y-4"
+          >
             <div className="grid grid-cols-2 gap-4">
               <div
-                className={`flex items-center space-x-2 border ${errors.ownership ? "border-red-500" : "border-gray-200"} rounded-full p-4`}
+                className={`flex items-center space-x-2 border ${
+                  errors.ownership ? "border-red-500" : "border-gray-200"
+                } rounded-full p-4`}
               >
-                <RadioGroupItem value="yes" id="yes" className="text-orange-400" />
+                <RadioGroupItem
+                  value="yes"
+                  id="yes"
+                  className="text-orange-400"
+                />
                 <Label htmlFor="yes" className="flex-grow cursor-pointer">
                   Yes
                 </Label>
               </div>
               <div
-                className={`flex items-center space-x-2 border ${errors.ownership ? "border-red-500" : "border-gray-200"} rounded-full p-4`}
+                className={`flex items-center space-x-2 border ${
+                  errors.ownership ? "border-red-500" : "border-gray-200"
+                } rounded-full p-4`}
               >
-                <RadioGroupItem value="no" id="no" className="text-orange-400" />
+                <RadioGroupItem
+                  value="no"
+                  id="no"
+                  className="text-orange-400"
+                />
                 <Label htmlFor="no" className="flex-grow cursor-pointer">
                   No
                 </Label>
@@ -267,18 +312,30 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             </div>
 
             <div
-              className={`flex items-center space-x-2 border ${errors.ownership ? "border-red-500" : "border-gray-200"} rounded-full p-4`}
+              className={`flex items-center space-x-2 border ${
+                errors.ownership ? "border-red-500" : "border-gray-200"
+              } rounded-full p-4`}
             >
-              <RadioGroupItem value="considering" id="considering" className="text-orange-400" />
+              <RadioGroupItem
+                value="considering"
+                id="considering"
+                className="text-orange-400"
+              />
               <Label htmlFor="considering" className="flex-grow cursor-pointer">
                 No, but I am considering purchasing it
               </Label>
             </div>
           </RadioGroup>
-          {errors.ownership && <p className="text-red-500 text-sm">{errors.ownership}</p>}
+          {errors.ownership && (
+            <p className="text-red-500 text-sm">{errors.ownership}</p>
+          )}
 
           <div className="flex justify-between items-center">
-            <Button onClick={prevStep} variant="ghost" className="flex items-center gap-2 text-gray-600">
+            <Button
+              onClick={prevStep}
+              variant="ghost"
+              className="flex items-center gap-2 text-gray-600"
+            >
               <ArrowLeft size={16} />
               Back
             </Button>
@@ -330,5 +387,5 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

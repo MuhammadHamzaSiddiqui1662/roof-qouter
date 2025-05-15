@@ -1,4 +1,3 @@
-import { StepForm } from "@/components/form/form";
 import HomeHeroSection from "@/components/hero-sections/hero-section-home";
 import { ArrowIcon } from "@/components/icons/arrowIcon";
 import { HomeIcon } from "@/components/icons/homeIcon";
@@ -7,7 +6,6 @@ import { BlogSection } from "@/components/sub-components/blogs";
 import { CTASection } from "@/components/sub-components/cta-section";
 import DynamicCarousel from "@/components/sub-components/dynamic-carousel";
 import { Testimonials } from "@/components/sub-components/testimonial";
-import TriangleImage from "@/components/sub-components/triangleImage";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
