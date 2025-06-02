@@ -1,32 +1,196 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type React from "react";
+import Cookies from "js-cookie";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProgressIndicator } from "../sub-components/progress-indicator";
 import { ArrowLeft } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import ReactGoogleAutocomplete from "react-google-autocomplete";
+import SubStepForm from "../subStepForm/sub-step-form";
 
 interface StepFormProps {
   currentStep: number;
   setCurrentStep: (step: number) => void;
 }
+type RoofMaterial = "shingle" | "metal" | "tile";
+
+interface Step1Info {
+  name: string;
+  phone: string;
+  email: string;
+  isOwner: string;
+}
+
+interface Step2Info {
+  roofLeak: string;
+  roofAge: string;
+}
+
+interface Step3Info {
+  yourRoof: string;
+  roofMaterial: string;
+}
+
+interface Step4Info {
+  company: string;
+}
+
+interface OwnershipState {
+  step1Info: Step1Info;
+  step2Info: Step2Info;
+  step3Info: Step3Info;
+  step4Info: Step4Info;
+}
+
+interface Company {
+  name: string;
+  shingle: string;
+  metal: string;
+  tile: string;
+}
+
+const API_KEY = "AIzaSyAKk0-KsCS2mJ6IBtUVNBpZ8Js1kWCZblU";
+
+const companies: Company[] = [
+  {
+    name: "Mark Kaufman Roofing",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Roof Smart of SW Florida",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+  {
+    name: "Roofs Only Florida",
+    shingle: "$5-$7",
+    metal: "$10-$14",
+    tile: "$14-$18",
+  },
+  {
+    name: "CW's Quality Roofing, Inc.",
+    shingle: "$5-$7",
+    metal: "$10-$14",
+    tile: "$10-$15",
+  },
+  {
+    name: "Able Sterling Roofing",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Suncastle Roofing, Inc.",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+  {
+    name: "Resolute Roofing LLC",
+    shingle: "$4.5-$6.5",
+    metal: "$10-$14",
+    tile: "$14-$18",
+  },
+  {
+    name: "Roman Roofing Inc",
+    shingle: "$5-$7",
+    metal: "$8-$12",
+    tile: "$10-$15",
+  },
+  {
+    name: "Crowther Roofing & Cooling",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Kuykendall Roofing",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+];
 
 export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
   const totalSteps = 5;
-  const {} = useToast();
+  const { toast } = useToast();
+  const [currentSubStep, setCurrentSubStep] = useState<number>(1);
+  const totalSubStepsForStep4 = 4;
 
   // Form state
   const [formData, setFormData] = useState({
     zipCode: "",
     address: "",
     confirmAddress: "",
-    ownership: "",
+  });
+  const [ownership, setOwnership] = useState<OwnershipState>({
+    step1Info: {
+      name: "",
+      phone: "",
+      email: "",
+      isOwner: "",
+    },
+    step2Info: {
+      roofLeak: "",
+      roofAge: "",
+    },
+    step3Info: {
+      yourRoof: "",
+      roofMaterial: "",
+    },
+    step4Info: {
+      company: "",
+    },
   });
 
+  useEffect(() => {
+    const material = ownership.step3Info.roofMaterial as RoofMaterial;
+    const company = companies.find(
+      (c) => c.name === ownership.step4Info.company
+    );
+
+    if (material && company && company[material]) {
+      const findRate = company[material];
+      const [firstNumber, secondNumber] = findRate
+        .split("-")
+        .map((s) => s.replace("$", "").trim());
+
+      const sqft = Cookies.get("areaDisplay")?.split(" ")[0] || "0";
+      const firstTotal = Number(firstNumber) * Number(sqft);
+      const secondTotal = Number(secondNumber) * Number(sqft);
+      const grandTotal = `$${Math.round(firstTotal).toFixed(2)} - $${Math.round(
+        secondTotal
+      ).toFixed(2)}`;
+
+      Cookies.set("grandSqft", grandTotal);
+    }
+  }, [ownership?.step3Info?.roofMaterial, ownership?.step4Info?.company]);
+
+  const [ownershipError, setOwnershipError] = useState<OwnershipState>({
+    step1Info: {
+      name: "",
+      phone: "",
+      email: "",
+      isOwner: "",
+    },
+    step2Info: {
+      roofLeak: "",
+      roofAge: "",
+    },
+    step3Info: {
+      yourRoof: "",
+      roofMaterial: "",
+    },
+    step4Info: {
+      company: "",
+    },
+  });
   // Form validation errors
   const [errors, setErrors] = useState({
     zipCode: "",
@@ -38,6 +202,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
+    if (id === "zipCode") {
+      Cookies.set("zipCode", value);
+    }
     setFormData({
       ...formData,
       [id]: value,
@@ -52,64 +219,110 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     }
   };
 
-  // Handle radio change
-  const handleRadioChange = (value: string) => {
-    setFormData({
-      ...formData,
-      ownership: value,
-    });
-
-    // Clear error when user selects
-    if (errors.ownership) {
-      setErrors({
-        ...errors,
-        ownership: "",
-      });
-    }
-  };
-
   // Validate current step
   const validateStep = () => {
     let isValid = true;
-    const newErrors = { ...errors };
+
+    const newFormErrors = { ...errors };
+    const newOwnershipErrors: OwnershipState = {
+      step1Info: { name: "", phone: "", email: "", isOwner: "" },
+      step2Info: { roofLeak: "", roofAge: "" },
+      step3Info: { yourRoof: "", roofMaterial: "" },
+      step4Info: { company: "" },
+    };
 
     if (currentStep === 1) {
       if (!formData.zipCode.trim()) {
-        newErrors.zipCode = " ";
+        newFormErrors.zipCode = "Zip code is required";
         isValid = false;
       }
     } else if (currentStep === 2) {
       if (!formData.address.trim()) {
-        newErrors.address = " ";
-        isValid = false;
-      }
-    } else if (currentStep === 3) {
-      if (!formData.confirmAddress.trim()) {
-        newErrors.confirmAddress = " ";
+        newFormErrors.address = "Address is required";
         isValid = false;
       }
     } else if (currentStep === 4) {
-      if (!formData.ownership) {
-        newErrors.ownership = " ";
-        isValid = false;
+      // Step 1 Info
+      if (currentSubStep === 1) {
+        if (!ownership.step1Info.name.trim()) {
+          newOwnershipErrors.step1Info.name = "Name is required";
+          isValid = false;
+        }
+        if (!ownership.step1Info.phone.trim()) {
+          newOwnershipErrors.step1Info.phone = "Phone is required";
+          isValid = false;
+        }
+        if (!ownership.step1Info.email.trim()) {
+          newOwnershipErrors.step1Info.email = "Email is required";
+          isValid = false;
+        }
+        if (!ownership.step1Info.isOwner.trim()) {
+          newOwnershipErrors.step1Info.isOwner = "Ownership status is required";
+          isValid = false;
+        }
+      }
+
+      // Step 2 Info
+      else if (currentSubStep === 2) {
+        if (!ownership.step2Info.roofLeak.trim()) {
+          newOwnershipErrors.step2Info.roofLeak = "Roof leak info is required";
+          isValid = false;
+        }
+        if (!ownership.step2Info.roofAge.trim()) {
+          newOwnershipErrors.step2Info.roofAge = "Roof age is required";
+          isValid = false;
+        }
+      }
+
+      // Step 3 Info
+      else if (currentSubStep === 3) {
+        if (!ownership.step3Info.yourRoof.trim()) {
+          newOwnershipErrors.step3Info.yourRoof = "Your roof info is required";
+          isValid = false;
+        }
+        if (!ownership.step3Info.roofMaterial.trim()) {
+          newOwnershipErrors.step3Info.roofMaterial =
+            "Roof material is required";
+          isValid = false;
+        }
+      }
+
+      // Step 4 Info
+      else if (currentSubStep === 4) {
+        if (!ownership.step4Info.company.trim()) {
+          newOwnershipErrors.step4Info.company = "Company info is required";
+          isValid = false;
+        }
       }
     }
 
-    setErrors(newErrors);
+    setErrors(newFormErrors);
+    setOwnershipError(newOwnershipErrors);
     return isValid;
   };
 
   const nextStep = () => {
     if (validateStep()) {
-      if (currentStep < totalSteps) {
+      if (currentStep === 4) {
+        // Nested step handling
+        if (currentSubStep < totalSubStepsForStep4) {
+          setCurrentSubStep(currentSubStep + 1);
+        } else {
+          setCurrentSubStep(1); // Reset for next use
+          setCurrentStep(currentStep + 1); // Move to Step 5
+        }
+      } else if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
       }
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 1) {
+    if (currentStep === 4 && currentSubStep > 1) {
+      setCurrentSubStep(currentSubStep - 1);
+    } else if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setCurrentSubStep(1); // Reset substep on going back
     }
   };
 
@@ -128,15 +341,53 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     4: {
-      title:
-        "Do you currently own or have authority with respect to this house?",
+      title: "Please Enter Your Information?",
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     5: {
-      title: "Your Project Quote is $500",
+      title: `Your Project Quote is ${Cookies.get("grandSqft")}`,
       subtitle:
         "A display text style is intended for use at large sizes for headings, rather than for extended passages of body text.",
     },
+  };
+
+  const checkAddressProximity = (place: any) => {
+    try {
+      const addressComponents = place?.address_components;
+      const localZipCode = Cookies.get("zipCode");
+
+      const addressZipCode = addressComponents?.find((component: any) =>
+        component.types.includes("postal_code")
+      )?.short_name;
+
+      if (!addressZipCode) {
+        setErrors((prev) => ({
+          ...prev,
+          address: "Could not verify zip code for this address",
+        }));
+        return;
+      }
+
+      if (addressZipCode !== localZipCode) {
+        setErrors((prev) => ({
+          ...prev,
+          address: "The selected address is not in your entered zip code",
+        }));
+        return;
+      }
+
+      setErrors((prev) => ({ ...prev, address: "" }));
+      setFormData({ ...formData, address: place.formatted_address });
+      Cookies.set("address", place.formatted_address);
+
+      toast({
+        title: "Address verified",
+        description: "The address matches your zip code",
+      });
+    } catch (error) {
+      console.log("error:", error);
+      setErrors((prev) => ({ ...prev, address: "Error verifying address" }));
+    }
   };
 
   return (
@@ -198,15 +449,47 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       {currentStep === 2 && (
         <div className="space-y-6">
           <div>
-            <Input
+            <ReactGoogleAutocomplete
+              apiKey={API_KEY}
               id="address"
               placeholder="Enter address"
               className={`mt-1 p-4 h-12 ${
                 errors.address ? "border-red-500" : ""
               }`}
-              value={formData.address}
-              onChange={handleInputChange}
+              onPlaceSelected={(place) => {
+                checkAddressProximity(place);
+              }}
+              style={{
+                backgroundColor: "#EFF0F6",
+                display: "flex",
+                height: "3rem",
+                width: "100%",
+                minWidth: "0",
+                borderRadius: "9999px",
+                border: "1px solid #D1D5DB",
+                paddingLeft: "0.75rem",
+                paddingRight: "0.75rem",
+                fontSize: "1rem",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                transition: "color 0.2s, box-shadow 0.2s",
+                outline: "none",
+                color: "#111827",
+                pointerEvents: "auto",
+                cursor: "text",
+                opacity: 1,
+                fontFamily: "inherit",
+              }}
               required
+              types={["address"]}
+              componentRestrictions={{
+                country: ["us", "gb", "au"],
+              }}
+              options={{
+                types: ["address"],
+                componentRestrictions: {
+                  country: ["us", "gb", "au"],
+                },
+              }}
             />
             {errors.address && (
               <p className="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -242,9 +525,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
               className={`mt-1 p-4 h-12 ${
                 errors.confirmAddress ? "border-red-500" : ""
               }`}
-              value={formData.confirmAddress}
-              onChange={handleInputChange}
-              required
+              value={Cookies.get("address") || ""}
+              onChange={() => {}}
+              disabled
             />
             {errors.confirmAddress && (
               <p className="text-red-500 text-sm mt-1">
@@ -274,79 +557,15 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
 
       {/* Step 4 */}
       {currentStep === 4 && (
-        <div className="space-y-6">
-          <RadioGroup
-            value={formData.ownership}
-            onValueChange={handleRadioChange}
-            className="space-y-4"
-          >
-            <div className="grid grid-cols-2 gap-4">
-              <div
-                className={`flex items-center space-x-2 border ${
-                  errors.ownership ? "border-red-500" : "border-gray-200"
-                } rounded-full p-4`}
-              >
-                <RadioGroupItem
-                  value="yes"
-                  id="yes"
-                  className="text-orange-400"
-                />
-                <Label htmlFor="yes" className="flex-grow cursor-pointer">
-                  Yes
-                </Label>
-              </div>
-              <div
-                className={`flex items-center space-x-2 border ${
-                  errors.ownership ? "border-red-500" : "border-gray-200"
-                } rounded-full p-4`}
-              >
-                <RadioGroupItem
-                  value="no"
-                  id="no"
-                  className="text-orange-400"
-                />
-                <Label htmlFor="no" className="flex-grow cursor-pointer">
-                  No
-                </Label>
-              </div>
-            </div>
-
-            <div
-              className={`flex items-center space-x-2 border ${
-                errors.ownership ? "border-red-500" : "border-gray-200"
-              } rounded-full p-4`}
-            >
-              <RadioGroupItem
-                value="considering"
-                id="considering"
-                className="text-orange-400"
-              />
-              <Label htmlFor="considering" className="flex-grow cursor-pointer">
-                No, but I am considering purchasing it
-              </Label>
-            </div>
-          </RadioGroup>
-          {errors.ownership && (
-            <p className="text-red-500 text-sm">{errors.ownership}</p>
-          )}
-
-          <div className="flex justify-between items-center">
-            <Button
-              onClick={prevStep}
-              variant="ghost"
-              className="flex items-center gap-2 text-gray-600"
-            >
-              <ArrowLeft size={16} />
-              Back
-            </Button>
-            <Button
-              onClick={nextStep}
-              className="rounded-full px-6 py-2 h-12 bg-orange-400 text-white hover:bg-orange-500"
-            >
-              Confirm
-            </Button>
-          </div>
-        </div>
+        <SubStepForm
+          currentSubStep={currentSubStep}
+          setOwnership={setOwnership}
+          companyName={companies}
+          errors={ownershipError}
+          ownership={ownership}
+          nextStep={nextStep}
+          prevStep={prevStep}
+        />
       )}
 
       {/* Step 5 - Final Quote */}
