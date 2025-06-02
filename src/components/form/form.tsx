@@ -52,77 +52,76 @@ interface Company {
   tile: string;
 }
 
+const API_KEY = "AIzaSyAKk0-KsCS2mJ6IBtUVNBpZ8Js1kWCZblU";
 
-const API_KEY = "AIzaSyAKk0-KsCS2mJ6IBtUVNBpZ8Js1kWCZblU"
+const companies: Company[] = [
+  {
+    name: "Mark Kaufman Roofing",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Roof Smart of SW Florida",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+  {
+    name: "Roofs Only Florida",
+    shingle: "$5-$7",
+    metal: "$10-$14",
+    tile: "$14-$18",
+  },
+  {
+    name: "CW's Quality Roofing, Inc.",
+    shingle: "$5-$7",
+    metal: "$10-$14",
+    tile: "$10-$15",
+  },
+  {
+    name: "Able Sterling Roofing",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Suncastle Roofing, Inc.",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+  {
+    name: "Resolute Roofing LLC",
+    shingle: "$4.5-$6.5",
+    metal: "$10-$14",
+    tile: "$14-$18",
+  },
+  {
+    name: "Roman Roofing Inc",
+    shingle: "$5-$7",
+    metal: "$8-$12",
+    tile: "$10-$15",
+  },
+  {
+    name: "Crowther Roofing & Cooling",
+    shingle: "$4-$6",
+    metal: "$8-$12",
+    tile: "$11-$15",
+  },
+  {
+    name: "Kuykendall Roofing",
+    shingle: "$4.5-$6.5",
+    metal: "$9-$13",
+    tile: "$14-$18",
+  },
+];
 
 export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
   const totalSteps = 5;
   const { toast } = useToast();
   const [currentSubStep, setCurrentSubStep] = useState<number>(1);
-  const totalSubStepsForStep4 = 4
-
-  const companies: Company[] = [
-    {
-      name: "Mark Kaufman Roofing",
-      shingle: "$4-$6",
-      metal: "$8-$12",
-      tile: "$11-$15"
-    },
-    {
-      name: "Roof Smart of SW Florida",
-      shingle: "$4.5-$6.5",
-      metal: "$9-$13",
-      tile: "$14-$18"
-    },
-    {
-      name: "Roofs Only Florida",
-      shingle: "$5-$7",
-      metal: "$10-$14",
-      tile: "$14-$18"
-    },
-    {
-      name: "CW's Quality Roofing, Inc.",
-      shingle: "$5-$7",
-      metal: "$10-$14",
-      tile: "$10-$15"
-    },
-    {
-      name: "Able Sterling Roofing",
-      shingle: "$4-$6",
-      metal: "$8-$12",
-      tile: "$11-$15"
-    },
-    {
-      name: "Suncastle Roofing, Inc.",
-      shingle: "$4.5-$6.5",
-      metal: "$9-$13",
-      tile: "$14-$18"
-    },
-    {
-      name: "Resolute Roofing LLC",
-      shingle: "$4.5-$6.5",
-      metal: "$10-$14",
-      tile: "$14-$18"
-    },
-    {
-      name: "Roman Roofing Inc",
-      shingle: "$5-$7",
-      metal: "$8-$12",
-      tile: "$10-$15"
-    },
-    {
-      name: "Crowther Roofing & Cooling",
-      shingle: "$4-$6",
-      metal: "$8-$12",
-      tile: "$11-$15"
-    },
-    {
-      name: "Kuykendall Roofing",
-      shingle: "$4.5-$6.5",
-      metal: "$9-$13",
-      tile: "$14-$18"
-    },
-  ]
+  const totalSubStepsForStep4 = 4;
 
   // Form state
   const [formData, setFormData] = useState({
@@ -135,11 +134,11 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       name: "",
       phone: "",
       email: "",
-      isOwner: ""
+      isOwner: "",
     },
     step2Info: {
       roofLeak: "",
-      roofAge: ""
+      roofAge: "",
     },
     step3Info: {
       yourRoof: "",
@@ -147,41 +146,42 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     },
     step4Info: {
       company: "",
-    }
-
+    },
   });
 
   useEffect(() => {
     const material = ownership.step3Info.roofMaterial as RoofMaterial;
-    const company = companies.find(c => c.name === ownership.step4Info.company);
+    const company = companies.find(
+      (c) => c.name === ownership.step4Info.company
+    );
 
     if (material && company && company[material]) {
       const findRate = company[material];
       const [firstNumber, secondNumber] = findRate
         .split("-")
-        .map(s => s.replace("$", "").trim());
+        .map((s) => s.replace("$", "").trim());
 
       const sqft = Cookies.get("areaDisplay")?.split(" ")[0] || "0";
       const firstTotal = Number(firstNumber) * Number(sqft);
       const secondTotal = Number(secondNumber) * Number(sqft);
-      const grandTotal = `$${Math.round(firstTotal).toFixed(2)} - $${Math.round(secondTotal).toFixed(2)}`;
+      const grandTotal = `$${Math.round(firstTotal).toFixed(2)} - $${Math.round(
+        secondTotal
+      ).toFixed(2)}`;
 
       Cookies.set("grandSqft", grandTotal);
     }
   }, [ownership?.step3Info?.roofMaterial, ownership?.step4Info?.company]);
-
-
 
   const [ownershipError, setOwnershipError] = useState<OwnershipState>({
     step1Info: {
       name: "",
       phone: "",
       email: "",
-      isOwner: ""
+      isOwner: "",
     },
     step2Info: {
       roofLeak: "",
-      roofAge: ""
+      roofAge: "",
     },
     step3Info: {
       yourRoof: "",
@@ -189,7 +189,7 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     },
     step4Info: {
       company: "",
-    }
+    },
   });
   // Form validation errors
   const [errors, setErrors] = useState({
@@ -204,7 +204,6 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     const { id, value } = e.target;
     if (id === "zipCode") {
       Cookies.set("zipCode", value);
-
     }
     setFormData({
       ...formData,
@@ -219,7 +218,6 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       });
     }
   };
-
 
   // Validate current step
   const validateStep = () => {
@@ -283,7 +281,8 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
           isValid = false;
         }
         if (!ownership.step3Info.roofMaterial.trim()) {
-          newOwnershipErrors.step3Info.roofMaterial = "Roof material is required";
+          newOwnershipErrors.step3Info.roofMaterial =
+            "Roof material is required";
           isValid = false;
         }
       }
@@ -302,7 +301,6 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     return isValid;
   };
 
-
   const nextStep = () => {
     if (validateStep()) {
       if (currentStep === 4) {
@@ -319,7 +317,6 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     }
   };
 
-
   const prevStep = () => {
     if (currentStep === 4 && currentSubStep > 1) {
       setCurrentSubStep(currentSubStep - 1);
@@ -328,7 +325,6 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       setCurrentSubStep(1); // Reset substep on going back
     }
   };
-
 
   // Step titles and subtitles
   const stepContent = {
@@ -345,8 +341,7 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     4: {
-      title:
-        "Please Enter Your Information?",
+      title: "Please Enter Your Information?",
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     5: {
@@ -356,44 +351,44 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     },
   };
 
-
   const checkAddressProximity = (place: any) => {
     try {
       const addressComponents = place?.address_components;
       const localZipCode = Cookies.get("zipCode");
 
-
       const addressZipCode = addressComponents?.find((component: any) =>
-        component.types.includes('postal_code')
+        component.types.includes("postal_code")
       )?.short_name;
 
       if (!addressZipCode) {
-        setErrors(prev => ({ ...prev, address: "Could not verify zip code for this address" }));
+        setErrors((prev) => ({
+          ...prev,
+          address: "Could not verify zip code for this address",
+        }));
         return;
       }
-
 
       if (addressZipCode !== localZipCode) {
-        setErrors(prev => ({ ...prev, address: "The selected address is not in your entered zip code" }));
+        setErrors((prev) => ({
+          ...prev,
+          address: "The selected address is not in your entered zip code",
+        }));
         return;
       }
 
-      setErrors(prev => ({ ...prev, address: "" }));
+      setErrors((prev) => ({ ...prev, address: "" }));
       setFormData({ ...formData, address: place.formatted_address });
       Cookies.set("address", place.formatted_address);
-
 
       toast({
         title: "Address verified",
         description: "The address matches your zip code",
       });
-
     } catch (error) {
-      console.log("error:", error)
-      setErrors(prev => ({ ...prev, address: "Error verifying address" }));
+      console.log("error:", error);
+      setErrors((prev) => ({ ...prev, address: "Error verifying address" }));
     }
   };
-
 
   return (
     <div>
@@ -417,8 +412,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="zipCode"
               placeholder="Enter zip code"
-              className={`mt-1 p-4 h-12 ${errors.zipCode ? "border-red-500" : ""
-                }`}
+              className={`mt-1 p-4 h-12 ${
+                errors.zipCode ? "border-red-500" : ""
+              }`}
               value={formData.zipCode}
               onChange={handleInputChange}
               required
@@ -457,41 +453,41 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
               apiKey={API_KEY}
               id="address"
               placeholder="Enter address"
-              className={`mt-1 p-4 h-12 ${errors.address ? "border-red-500" : ""}`}
+              className={`mt-1 p-4 h-12 ${
+                errors.address ? "border-red-500" : ""
+              }`}
               onPlaceSelected={(place) => {
                 checkAddressProximity(place);
               }}
-
               style={{
-                backgroundColor: '#EFF0F6',
-                display: 'flex',
-                height: '3rem',
-                width: '100%',
-                minWidth: '0',
-                borderRadius: '9999px',
-                border: '1px solid #D1D5DB',
-                paddingLeft: '0.75rem',
-                paddingRight: '0.75rem',
-                fontSize: '1rem',
-                boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                transition: 'color 0.2s, box-shadow 0.2s',
-                outline: 'none',
-                color: '#111827',
-                pointerEvents: 'auto',
-                cursor: 'text',
+                backgroundColor: "#EFF0F6",
+                display: "flex",
+                height: "3rem",
+                width: "100%",
+                minWidth: "0",
+                borderRadius: "9999px",
+                border: "1px solid #D1D5DB",
+                paddingLeft: "0.75rem",
+                paddingRight: "0.75rem",
+                fontSize: "1rem",
+                boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                transition: "color 0.2s, box-shadow 0.2s",
+                outline: "none",
+                color: "#111827",
+                pointerEvents: "auto",
+                cursor: "text",
                 opacity: 1,
-                fontFamily: 'inherit',
+                fontFamily: "inherit",
               }}
-
               required
               types={["address"]}
               componentRestrictions={{
-                country: ["us", "gb", "au"]
+                country: ["us", "gb", "au"],
               }}
               options={{
                 types: ["address"],
                 componentRestrictions: {
-                  country: ["us", "gb", "au"]
+                  country: ["us", "gb", "au"],
                 },
               }}
             />
@@ -526,12 +522,12 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="confirmAddress"
               placeholder="7500 Setzler Pkwy, Minneapolis, MN 55445, USA"
-              className={`mt-1 p-4 h-12 ${errors.confirmAddress ? "border-red-500" : ""
-                }`}
+              className={`mt-1 p-4 h-12 ${
+                errors.confirmAddress ? "border-red-500" : ""
+              }`}
               value={Cookies.get("address") || ""}
-              onChange={() => { }}
+              onChange={() => {}}
               disabled
-
             />
             {errors.confirmAddress && (
               <p className="text-red-500 text-sm mt-1">
@@ -561,7 +557,15 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
 
       {/* Step 4 */}
       {currentStep === 4 && (
-        <SubStepForm currentSubStep={currentSubStep} setOwnership={setOwnership} companyName={companies} errors={ownershipError} ownership={ownership} nextStep={nextStep} prevStep={prevStep} />
+        <SubStepForm
+          currentSubStep={currentSubStep}
+          setOwnership={setOwnership}
+          companyName={companies}
+          errors={ownershipError}
+          ownership={ownership}
+          nextStep={nextStep}
+          prevStep={prevStep}
+        />
       )}
 
       {/* Step 5 - Final Quote */}
