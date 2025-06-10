@@ -15,6 +15,9 @@ export default function HomeHeroSection() {
   const markerRef = useRef<google.maps.Marker | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
+  const polygonRef = useRef<google.maps.Polygon | null>(null)
+  const animationFrameId = useRef<number | null>(null) // animation ID to cancel later
+
   const backgroundImages: string[] = [
     "/assets/images/hero.jpg",
     "/assets/images/hero2.png",
@@ -96,13 +99,10 @@ export default function HomeHeroSection() {
 
           const coordinates: [number, number][] = closest.geometry.map(
             (coord: { lon: number; lat: number }) => [coord.lon, coord.lat]
-          );
+          )
+          coordinates.push(coordinates[0]) // close polygon
 
-          coordinates.push(coordinates[0]); // close polygon
-
-          const centroid = getCentroid(
-            coordinates.map(([lng, lat]): [number, number] => [lat, lng])
-          );
+          const centroid = getCentroid(coordinates.map(([lng, lat]): [number, number] => [lat, lng]))
 
           if (markerRef.current) markerRef.current.setMap(null);
 
@@ -112,10 +112,34 @@ export default function HomeHeroSection() {
             title: "Building Location",
           });
 
-          const turfPolygon = turf.polygon([coordinates]);
-          const areaSqFeet = turf.area(turfPolygon) * 10.7639;
+          if (polygonRef.current) {
+            polygonRef.current.setMap(null)
+            if (animationFrameId.current) {
+              cancelAnimationFrame(animationFrameId.current)
+              animationFrameId.current = null
+            }
+          }
 
-          updateAreaDisplay(`${areaSqFeet.toFixed(2)} sqft`);
+          const polygonPath = coordinates.map(([lng, lat]) => ({ lat, lng }))
+
+          polygonRef.current = new google.maps.Polygon({
+            paths: polygonPath,
+            strokeColor: "#08ff45",
+            strokeWeight: 3,
+            strokeOpacity: 1,
+            fillOpacity: 0,
+            map: map,
+          })
+
+          // Create polygon
+          // turf.js سے area calculate کریں
+          const turfPolygon = turf.polygon([coordinates])
+          const areaSqFeet = turf.area(turfPolygon) * 10.7639
+
+          updateAreaDisplay(`${areaSqFeet.toFixed(2)} sqft`)
+
+          // strokeOpacity animation شروع کریں
+          animateGlow()
         })
         .catch((err) => {
           console.error("Fetch error", err);
@@ -125,6 +149,34 @@ export default function HomeHeroSection() {
     },
     [updateAreaDisplay, getCentroid, getClosestBuilding, markerRef]
   );
+
+  const animateGlow = () => {
+    if (!polygonRef.current) return
+
+    let opacity = 0.2
+    let increasing = true
+
+    const step = () => {
+      if (!polygonRef.current) return
+
+      polygonRef.current.setOptions({
+        strokeOpacity: opacity,
+      })
+
+      if (increasing) {
+        opacity += 0.02
+        if (opacity >= 1) increasing = false
+      } else {
+        opacity -= 0.02
+        if (opacity <= 0.2) increasing = true
+      }
+
+      animationFrameId.current = requestAnimationFrame(step)
+    }
+
+    step()
+  }
+
 
   const geocodeAddress = useCallback(
     (map: google.maps.Map, address: string) => {
@@ -179,9 +231,8 @@ export default function HomeHeroSection() {
   return (
     <div className="relative">
       <div
-        className={`relative flex w-full items-center overflow-hidden ${
-          currentStep === 1 ? "min-h-[500px]" : "min-h-[350px]"
-        }`}
+        className={`relative flex w-full items-center overflow-hidden ${currentStep === 1 ? "min-h-[500px]" : "min-h-[350px]"
+          }`}
       >
         <div className="absolute inset-0 z-0">
           {currentStep === 3 ? (
@@ -206,11 +257,10 @@ export default function HomeHeroSection() {
           )}
 
           <div
-            className={`w-full ${
-              currentStep === 1
-                ? "md:w-1/2 max-lg:mt-4"
-                : "md:w-2/3 lg:w-1/2 absolute left-1/2 transform -translate-x-1/2 bottom-0 translate-y-1/2"
-            }`}
+            className={`w-full ${currentStep === 1
+              ? "md:w-1/2 max-lg:mt-4"
+              : "md:w-2/3 lg:w-1/2 absolute left-1/2 transform -translate-x-1/2 bottom-0 translate-y-1/2"
+              }`}
           >
             {currentStep === 1 && (
               <div className="rounded-4xl bg-white p-6 shadow-lg">

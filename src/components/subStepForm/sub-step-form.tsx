@@ -4,13 +4,17 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Button } from '../ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Star } from 'lucide-react';
+import { StaticImageData } from 'next/image';
 
 interface Company {
     name: string;
     shingle: string;
     metal: string;
     tile: string;
+    image: StaticImageData;
+    desc: string;
+    subDesc: string;
 }
 
 interface SubStepFormProps {
@@ -245,26 +249,70 @@ const SubStepForm = ({ currentSubStep, errors, ownership, setOwnership, companyN
 
             {currentSubStep === 4 && (
                 <div>
-                    <Select
-                        value={ownership.step4Info.company}
-                        onValueChange={(value) =>
-                            handleRadioChange(value, "step4Info", "company")
-                        }
-                    >
-                        <SelectTrigger size="lg" className="w-full">
-                            <SelectValue placeholder="Select Roofing Company(s) to see pricing" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {companyName?.map((item, index) => (
-                                <SelectItem key={index} value={item?.name}>
-                                    {item?.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    {errors.step4Info?.company && (
-                        <p className="text-red-500 text-sm mt-1">{errors.step4Info.company}</p>
-                    )}
+
+
+                    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                        {companyName.map((item: any) => {
+                            const isChecked = ownership.step4Info.company?.some((c: any) => c.name === item.name);
+
+                            const handleToggleCompany = () => {
+                                setOwnership((prev: any) => {
+                                    const alreadySelected = prev.step4Info.company?.some((c: any) => c.name === item.name);
+                                    const updatedCompanies = alreadySelected
+                                        ? prev.step4Info.company.filter((c: any) => c.name !== item.name) // remove
+                                        : [...prev.step4Info.company, item]; // add
+
+                                    return {
+                                        ...prev,
+                                        step4Info: {
+                                            ...prev.step4Info,
+                                            company: updatedCompanies,
+                                        },
+                                    };
+                                });
+                            };
+
+                            return (
+                                <div
+                                    key={item.name}
+                                    onClick={handleToggleCompany}
+                                    className="flex justify-between items-center gap-2 p-2 rounded-md hover:bg-accent/30 cursor-pointer w-full border"
+                                >
+                                    {/* Left: Image + Info */}
+                                    <div className="flex items-start gap-2">
+                                        <img
+                                            src={item.image?.src}
+                                            alt="company"
+                                            className="w-12 h-10 object-contain rounded-sm"
+                                        />
+                                        <div className="flex flex-col text-sm">
+                                            <span className="font-semibold">{item.name}</span>
+                                            <span className="flex gap-1 items-center text-xs text-yellow-500">
+                                                {[1, 1, 1, 1, 1].map((_, i) => (
+                                                    <Star key={i} size={10} fill="#FFD700" />
+                                                ))}
+                                                {item.desc}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {item.subDesc}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Right: Checkbox */}
+                                    <input
+                                        type="checkbox"
+                                        checked={isChecked}
+                                        readOnly
+                                        className="ml-auto"
+                                    />
+                                </div>
+                            );
+                        })}
+
+                    </div>
+
+
                 </div>
             )}
 
