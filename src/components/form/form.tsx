@@ -11,16 +11,20 @@ import { useToast } from "@/components/ui/use-toast";
 import ReactGoogleAutocomplete from "react-google-autocomplete";
 import SubStepForm from "../subStepForm/sub-step-form";
 import { StaticImageData } from "next/image";
-import MKCompImg from "../../../public/assets/images/company-data/1.png"
-import ROCompImg from "../../../public/assets/images/company-data/2.png"
-import RSCompImg from "../../../public/assets/images/company-data/3.png"
-import ASRCompImg from "../../../public/assets/images/company-data/4.png"
-import CWCompImg from "../../../public/assets/images/company-data/5.png"
-import SRCompImg from "../../../public/assets/images/company-data/6.png"
-import RRCompImg from "../../../public/assets/images/company-data/7.png"
-import RomanCompImg from "../../../public/assets/images/company-data/8.png"
-import KRCompImg from "../../../public/assets/images/company-data/9.png"
-import CrowtherCompImg from "../../../public/assets/images/company-data/10.png"
+import MKCompImg from "../../../public/assets/images/company-data/1.png";
+import ROCompImg from "../../../public/assets/images/company-data/2.png";
+import RSCompImg from "../../../public/assets/images/company-data/3.png";
+import ASRCompImg from "../../../public/assets/images/company-data/4.png";
+import CWCompImg from "../../../public/assets/images/company-data/5.png";
+import SRCompImg from "../../../public/assets/images/company-data/6.png";
+import RRCompImg from "../../../public/assets/images/company-data/7.png";
+import RomanCompImg from "../../../public/assets/images/company-data/8.png";
+import KRCompImg from "../../../public/assets/images/company-data/9.png";
+import CrowtherCompImg from "../../../public/assets/images/company-data/10.png";
+import {
+  createPipedriveLead,
+  createPipedrivePerson,
+} from "../../api/functions/pipedrive";
 
 interface StepFormProps {
   currentStep: number;
@@ -61,9 +65,9 @@ interface Company {
   shingle: string;
   metal: string;
   tile: string;
-  image: StaticImageData,
-  desc: string,
-  subDesc: string
+  image: StaticImageData;
+  desc: string;
+  subDesc: string;
 }
 
 const API_KEY = "AIzaSyAKk0-KsCS2mJ6IBtUVNBpZ8Js1kWCZblU";
@@ -76,7 +80,7 @@ const companies: Company[] = [
     tile: "$11-$15",
     image: MKCompImg,
     desc: "4.7 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Roof Smart of SW Florida",
@@ -85,7 +89,7 @@ const companies: Company[] = [
     tile: "$14-$18",
     image: ROCompImg,
     desc: "4.9 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Roofs Only Florida",
@@ -94,7 +98,7 @@ const companies: Company[] = [
     tile: "$14-$18",
     image: RSCompImg,
     desc: "4.5 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "CW's Quality Roofing, Inc.",
@@ -103,7 +107,7 @@ const companies: Company[] = [
     tile: "$10-$15",
     image: CWCompImg,
     desc: "4.6 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Able Sterling Roofing",
@@ -112,7 +116,7 @@ const companies: Company[] = [
     tile: "$11-$15",
     image: ASRCompImg,
     desc: "4.7 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Suncastle Roofing, Inc.",
@@ -121,7 +125,7 @@ const companies: Company[] = [
     tile: "$14-$18",
     image: SRCompImg,
     desc: "4.7 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Resolute Roofing LLC",
@@ -130,7 +134,7 @@ const companies: Company[] = [
     tile: "$14-$18",
     image: RRCompImg,
     desc: "4.7 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Roman Roofing Inc",
@@ -139,7 +143,7 @@ const companies: Company[] = [
     tile: "$10-$15",
     image: RomanCompImg,
     desc: "4.8 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Crowther Roofing & Cooling",
@@ -148,7 +152,7 @@ const companies: Company[] = [
     tile: "$11-$15",
     image: CrowtherCompImg,
     desc: "4.7 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
   {
     name: "Kuykendall Roofing",
@@ -157,17 +161,18 @@ const companies: Company[] = [
     tile: "$14-$18",
     image: KRCompImg,
     desc: "4.8 tar in bus",
-    subDesc: "BBB Accredited"
+    subDesc: "BBB Accredited",
   },
-]
+];
 
 export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
   const totalSteps = 5;
   const { toast } = useToast();
   const [currentSubStep, setCurrentSubStep] = useState<number>(1);
   const totalSubStepsForStep4 = 4;
-  const grandSqft = Cookies.get("grandSqft") ? JSON.parse(Cookies.get("grandSqft") as string) : [];
-
+  const grandSqft = Cookies.get("grandSqft")
+    ? JSON.parse(Cookies.get("grandSqft") as string)
+    : [];
 
   // Form state
   const [formData, setFormData] = useState({
@@ -195,44 +200,80 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
     },
   });
 
+  console.log("Form Data:", { formData, ownership });
+  const submitInformation = async () => {
+    const userPayload = {
+      name: ownership?.step1Info?.name || "",
+      owner_id: 23479005,
+      email: [
+        {
+          value: ownership?.step1Info?.email || "",
+          primary: true,
+          label: "Work",
+        },
+      ],
+      phone: [
+        {
+          value: ownership?.step1Info?.phone || "",
+          primary: true,
+          label: "Work",
+        },
+      ],
+    };
+    const userRes = await createPipedrivePerson(userPayload);
+    if (userRes?.status) {
+      const leadPayload = {
+        title: userRes?.data?.data?.name,
+        owner_id: 23479005,
+        person_id: userRes?.data?.data?.id,
+      };
+      const leadRes = await createPipedriveLead(leadPayload);
+      console.log("User res-------", leadRes);
+    }
+  };
+
   useEffect(() => {
     const material = ownership.step3Info.roofMaterial as RoofMaterial;
     const selectedCompanies = ownership.step4Info.company; // Array
 
-    if (!material || !selectedCompanies || selectedCompanies.length === 0) return;
+    if (!material || !selectedCompanies || selectedCompanies.length === 0)
+      return;
 
     const sqft = Cookies.get("areaDisplay")?.split(" ")[0] || "0";
 
-    const allGrandTotals = selectedCompanies.map((selected: any) => {
-      const company = companies.find((c) => c.name === selected.name);
+    const allGrandTotals = selectedCompanies
+      .map((selected: any) => {
+        const company = companies.find((c) => c.name === selected.name);
 
-      if (company && company[material]) {
-        const rateRange = company[material]; // e.g., "$5 - $7"
-        const [firstNumber, secondNumber] = rateRange
-          .split("-")
-          .map((rate) => rate.replace("$", "").trim());
+        if (company && company[material]) {
+          const rateRange = company[material]; // e.g., "$5 - $7"
+          const [firstNumber, secondNumber] = rateRange
+            .split("-")
+            .map((rate) => rate.replace("$", "").trim());
 
-        const firstTotal = Number(firstNumber) * Number(sqft);
-        const secondTotal = Number(secondNumber) * Number(sqft);
+          const firstTotal = Number(firstNumber) * Number(sqft);
+          const secondTotal = Number(secondNumber) * Number(sqft);
 
-        const grandTotal = `$${Math.round(firstTotal).toFixed(2)} - $${Math.round(secondTotal).toFixed(2)}`;
-        return {
-          name: company.name,
-          grandTotal,
-        };
-      }
-      return null;
-    }).filter(Boolean); // remove nulls
+          const grandTotal = `$${Math.round(firstTotal).toFixed(
+            2
+          )} - $${Math.round(secondTotal).toFixed(2)}`;
+          return {
+            name: company.name,
+            grandTotal,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean); // remove nulls
 
     // Store in cookie as JSON string (optional)
     Cookies.set("grandSqft", JSON.stringify(allGrandTotals));
 
     console.log("All Grand Totals:", allGrandTotals);
-
   }, [
     JSON.stringify(ownership.step3Info.roofMaterial),
     JSON.stringify(ownership.step4Info.company),
-    JSON.stringify(companies)
+    JSON.stringify(companies),
   ]);
 
   const [ownershipError, setOwnershipError] = useState<OwnershipState>({
@@ -370,12 +411,15 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
         // Nested step handling
         if (currentSubStep < totalSubStepsForStep4) {
           setCurrentSubStep(currentSubStep + 1);
+          console.log("currentSubStep < totalSubStepsForStep4");
         } else {
+          submitInformation();
           setCurrentSubStep(1); // Reset for next use
           setCurrentStep(currentStep + 1); // Move to Step 5
         }
       } else if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
+        console.log("currentStep < totalSteps");
       }
     }
   };
@@ -408,7 +452,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       subtitle: "Please fill your information so we can get in touch with you.",
     },
     5: {
-      title: `Your Project Quote is ${grandSqft?.map((sqft: any) => `${sqft?.name} - ${sqft?.grandTotal || 0} sqft`).join(", ")}`,
+      title: `Your Project Quote is ${grandSqft
+        ?.map((sqft: any) => `${sqft?.name} - ${sqft?.grandTotal || 0} sqft`)
+        .join(", ")}`,
       subtitle:
         "A display text style is intended for use at large sizes for headings, rather than for extended passages of body text.",
     },
@@ -460,20 +506,28 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
       </div>
       <hr className="border-[#D9DBE9] my-6" />
 
-      {
-        currentStep === 5 ? <div className="mb-2">
-          <h2 className="text-2xl font-semibold text-gray-800">Your Project Quote is</h2>
+      {currentStep === 5 ? (
+        <div className="mb-2">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Your Project Quote is
+          </h2>
           <ul>
             {grandSqft?.map((sqft: any) => (
               <li key={sqft?.name}>
-                <h5 className="text-gray-800 text-xl font-semibold">   <span className="font-semibold">{sqft?.name}:</span> {sqft?.grandTotal || 0}</h5>
+                <h5 className="text-gray-800 text-xl font-semibold">
+                  {" "}
+                  <span className="font-semibold">{sqft?.name}:</span>{" "}
+                  {sqft?.grandTotal || 0}
+                </h5>
               </li>
             ))}
           </ul>
-        </div> : <h2 className="mb-2 text-2xl font-semibold text-gray-800">
+        </div>
+      ) : (
+        <h2 className="mb-2 text-2xl font-semibold text-gray-800">
           {stepContent[currentStep as keyof typeof stepContent]?.title}
         </h2>
-      }
+      )}
 
       <p className="mb-6 text-gray-500">
         {stepContent[currentStep as keyof typeof stepContent]?.subtitle}
@@ -486,8 +540,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="zipCode"
               placeholder="Enter zip code"
-              className={`mt-1 p-4 h-12 ${errors.zipCode ? "border-red-500" : ""
-                }`}
+              className={`mt-1 p-4 h-12 ${
+                errors.zipCode ? "border-red-500" : ""
+              }`}
               value={formData.zipCode}
               onChange={handleInputChange}
               required
@@ -526,8 +581,9 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
               apiKey={API_KEY}
               id="address"
               placeholder="Enter address"
-              className={`mt-1 p-4 h-12 ${errors.address ? "border-red-500" : ""
-                }`}
+              className={`mt-1 p-4 h-12 ${
+                errors.address ? "border-red-500" : ""
+              }`}
               onPlaceSelected={(place) => {
                 checkAddressProximity(place);
               }}
@@ -590,10 +646,11 @@ export function StepForm({ currentStep, setCurrentStep }: StepFormProps) {
             <Input
               id="confirmAddress"
               placeholder="7500 Setzler Pkwy, Minneapolis, MN 55445, USA"
-              className={`mt-1 p-4 h-12 ${errors.confirmAddress ? "border-red-500" : ""
-                }`}
+              className={`mt-1 p-4 h-12 ${
+                errors.confirmAddress ? "border-red-500" : ""
+              }`}
               value={Cookies.get("address") || ""}
-              onChange={() => { }}
+              onChange={() => {}}
               disabled
             />
             {errors.confirmAddress && (
